@@ -62,6 +62,13 @@ if [ "$1" = 'redis-cluster' ]; then
         PORT=${port} BIND_ADDRESS=${BIND_ADDRESS} envsubst < /redis-conf/redis.tmpl > /redis-conf/${port}/redis.conf
       fi
 
+      # Load the modules bundled with the base image (redisbloom, redisearch, rejson, ...).
+      # The official image's entrypoint normally does this; ours replaces it, so the
+      # generated configs must. Guarded: module-less bases (e.g. redis < 8) ship no .so files.
+      for mod in /usr/local/lib/redis/modules/*.so; do
+        [ -e "$mod" ] && echo "loadmodule $mod" >> /redis-conf/${port}/redis.conf
+      done
+
       if [ "$port" -lt $(($INITIAL_PORT + $MASTERS)) ]; then
         if [ "$SENTINEL" = "true" ]; then
           PORT=${port} SENTINEL_PORT=$((port - 2000)) envsubst < /redis-conf/sentinel.tmpl > /redis-conf/sentinel-${port}.conf

@@ -6,6 +6,8 @@
 
 Docker image with redis built and installed from source and a cluster is built.
 
+The modules bundled with the Redis 8+ base image (redisbloom, redisearch, rejson, redistimeseries, ...) are loaded automatically on every node, cluster and standalone alike.
+
 To find all redis-server releases see them here https://github.com/antirez/redis/releases
 
 
